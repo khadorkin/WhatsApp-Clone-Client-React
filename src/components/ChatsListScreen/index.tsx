@@ -2,10 +2,10 @@ import * as React from 'react'
 import ChatsNavbar from './ChatsNavbar'
 import ChatsList from './ChatsList'
 
-const ChatsListScreen = () => (
+const ChatsListScreen = ({ history }) => (
   <div>
     <ChatsNavbar />
-    <ChatsList />
+    <ChatsList history={history} />
   </div>
 )
 
