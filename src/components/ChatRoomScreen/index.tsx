@@ -1,5 +1,16 @@
 import * as React from 'react'
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import styled from 'styled-components'
+import ChatNavbar from './ChatNavbar'
+import MessageInput from './MessageInput'
+import MessagesList from './MessagesList'
+
+const Container = styled.div `
+  background: url(/assets/chat-background.jpg);
+  display: flex;
+  flex-flow: column;
+  height: 100%;
+`
 
 const getChatQuery = `
   query GetChat($chatId: ID!) {
@@ -16,7 +27,7 @@ const getChatQuery = `
   }
 `
 
-const ChatRoomScreen = ({ match }) => {
+const ChatRoomScreen = ({ history, match }) => {
   const { params: { chatId } } = match
   const [chat, setChat] = useState(null)
 
@@ -35,20 +46,27 @@ const ChatRoomScreen = ({ match }) => {
     setChat(chat)
   }, [true])
 
+  const onSendMessage = useCallback((content) => {
+    const message = {
+      id: chat.messages.length + 1,
+      createdAt: Date.now(),
+      content,
+    }
+
+    setChat({
+      ...chat,
+      messages: chat.messages.concat(message),
+    })
+  }, [chat])
+
   if (!chat) return null
 
   return (
-    <div>
-      <img src={chat.picture} /><div>{chat.name}</div>
-      <ul>
-        {chat.messages.map((message) =>
-          <li key={message.id}>
-            <div>{message.content}</div>
-            <div>{message.createdAt}</div>
-          </li>
-        )}
-      </ul>
-    </div>
+    <Container>
+      <ChatNavbar chat={chat} history={history} />
+      <MessagesList messages={chat.messages} />
+      <MessageInput onSendMessage={onSendMessage} />
+    </Container>
   )
 }
 
